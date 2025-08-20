@@ -85,8 +85,18 @@ def main():
         
         # Extraction Settings
         st.subheader("⚙️ Extraction Settings")
-        max_depth = st.slider("Maximum Crawl Depth", 1, 10, config.get("max_depth", 3))
-        timeout = st.number_input("Request Timeout (seconds)", 5, 60, config.get("timeout", 30))
+        max_depth = st.slider(
+            "Maximum Crawl Depth", 
+            1, 10, 
+            config.get("max_depth", 3),
+            help="How many levels deep to follow links from the initial URL. Depth 1 = only the initial page, Depth 2 = initial page + linked pages, etc. Higher depths extract more data but take longer."
+        )
+        timeout = st.number_input(
+            "Request Timeout (seconds)", 
+            5, 60, 
+            config.get("timeout", 30),
+            help="Maximum time to wait for each web page to load"
+        )
         
         # Advanced Extraction
         st.subheader("🚀 Advanced Extraction")

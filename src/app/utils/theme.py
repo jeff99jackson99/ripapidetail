@@ -1,304 +1,12 @@
 """
-Beautiful theme configuration for Jeff's API Ripper
+Beautiful theme utilities for Jeff's API Ripper
+Provides modern, clean UI components with light backgrounds
 """
 
 import streamlit as st
-from typing import Dict, Any
-
-def apply_beautiful_theme():
-    """Apply a beautiful, modern theme to the Streamlit app"""
-    
-    # Custom CSS for beautiful styling
-    st.markdown("""
-    <style>
-    /* Main theme colors and fonts */
-    .main {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .stApp {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    }
-    
-    /* Beautiful headers */
-    h1, h2, h3 {
-        color: #2c3e50 !important;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-        font-weight: 600 !important;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-    }
-    
-    h1 {
-        font-size: 2.5rem !important;
-        margin-bottom: 1rem !important;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-        background-clip: text !important;
-    }
-    
-    h2 {
-        font-size: 2rem !important;
-        color: #34495e !important;
-        border-bottom: 3px solid #3498db !important;
-        padding-bottom: 0.5rem !important;
-    }
-    
-    h3 {
-        font-size: 1.5rem !important;
-        color: #2c3e50 !important;
-        border-left: 4px solid #3498db !important;
-        padding-left: 1rem !important;
-    }
-    
-    /* Beautiful buttons */
-    .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 25px !important;
-        padding: 0.75rem 2rem !important;
-        font-weight: 600 !important;
-        font-size: 1rem !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1px !important;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6) !important;
-    }
-    
-    /* Primary button styling */
-    .stButton > button[data-baseweb="button"] {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
-        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4) !important;
-    }
-    
-    .stButton > button[data-baseweb="button"]:hover {
-        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6) !important;
-    }
-    
-    /* Beautiful text inputs */
-    .stTextInput > div > div > input {
-        border: 2px solid #e0e6ed !important;
-        border-radius: 15px !important;
-        padding: 0.75rem 1rem !important;
-        font-size: 1rem !important;
-        transition: all 0.3s ease !important;
-        background: white !important;
-    }
-    
-    .stTextInput > div > div > input:focus {
-        border-color: #3498db !important;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
-        transform: translateY(-1px) !important;
-    }
-    
-    /* Beautiful selectboxes */
-    .stSelectbox > div > div > div {
-        border: 2px solid #e0e6ed !important;
-        border-radius: 15px !important;
-        background: white !important;
-    }
-    
-    .stSelectbox > div > div > div:hover {
-        border-color: #3498db !important;
-    }
-    
-    /* Beautiful file uploader */
-    .stFileUploader > div > div {
-        border: 2px dashed #3498db !important;
-        border-radius: 15px !important;
-        background: rgba(52, 152, 219, 0.05) !important;
-        padding: 2rem !important;
-        text-align: center !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .stFileUploader > div > div:hover {
-        border-color: #2980b9 !important;
-        background: rgba(52, 152, 219, 0.1) !important;
-        transform: scale(1.02) !important;
-    }
-    
-    /* Beautiful sidebar */
-    .css-1d391kg {
-        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%) !important;
-        color: white !important;
-    }
-    
-    .css-1d391kg h1, .css-1d391kg h2, .css-1d391kg h3 {
-        color: white !important;
-        text-shadow: none !important;
-    }
-    
-    /* Beautiful tabs */
-    .stTabs > div > div > div > div {
-        background: white !important;
-        border-radius: 15px 15px 0 0 !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
-    }
-    
-    .stTabs > div > div > div > div > button {
-        border-radius: 15px 15px 0 0 !important;
-        font-weight: 600 !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .stTabs > div > div > div > div > button[aria-selected="true"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
-    }
-    
-    /* Beautiful expanders */
-    .streamlit-expanderHeader {
-        background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%) !important;
-        border-radius: 10px !important;
-        border: none !important;
-        font-weight: 600 !important;
-        color: #2c3e50 !important;
-    }
-    
-    .streamlit-expanderContent {
-        background: white !important;
-        border-radius: 0 0 10px 10px !important;
-        border: 1px solid #e0e6ed !important;
-        margin-top: 0 !important;
-    }
-    
-    /* Beautiful success/error messages */
-    .stAlert {
-        border-radius: 15px !important;
-        border: none !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
-    }
-    
-    /* Beautiful dataframes */
-    .stDataFrame {
-        border-radius: 15px !important;
-        overflow: hidden !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
-    }
-    
-    /* Beautiful JSON displays */
-    .stJson {
-        background: #f8f9fa !important;
-        border-radius: 10px !important;
-        padding: 1rem !important;
-        border: 1px solid #e0e6ed !important;
-    }
-    
-    /* Beautiful code blocks */
-    .stCodeBlock {
-        background: #2c3e50 !important;
-        border-radius: 10px !important;
-        border: none !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-    }
-    
-    /* Beautiful progress bars */
-    .stProgress > div > div > div > div {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        border-radius: 10px !important;
-    }
-    
-    /* Beautiful spinners */
-    .stSpinner > div {
-        border: 3px solid #f3f3f3 !important;
-        border-top: 3px solid #3498db !important;
-        border-radius: 50% !important;
-    }
-    
-    /* Custom card styling */
-    .custom-card {
-        background: white !important;
-        border-radius: 20px !important;
-        padding: 2rem !important;
-        margin: 1rem 0 !important;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
-        border: 1px solid #e0e6ed !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .custom-card:hover {
-        transform: translateY(-5px) !important;
-        box-shadow: 0 12px 35px rgba(0,0,0,0.15) !important;
-    }
-    
-    /* Beautiful dividers */
-    .divider {
-        height: 3px !important;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        border-radius: 2px !important;
-        margin: 2rem 0 !important;
-    }
-    
-    /* Beautiful icons */
-    .icon-large {
-        font-size: 3rem !important;
-        margin: 1rem 0 !important;
-        text-align: center !important;
-    }
-    
-    /* Responsive design */
-    @media (max-width: 768px) {
-        h1 { font-size: 2rem !important; }
-        h2 { font-size: 1.5rem !important; }
-        h3 { font-size: 1.25rem !important; }
-        
-        .custom-card {
-            padding: 1rem !important;
-            margin: 0.5rem 0 !important;
-        }
-    }
-    
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-        .stApp {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
-        }
-        
-        .custom-card {
-            background: #2d2d2d !important;
-            color: white !important;
-            border-color: #404040 !important;
-        }
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-def create_beautiful_header(title: str, subtitle: str = "", icon: str = "🔍"):
-    """Create a beautiful header with gradient text and icon"""
-    st.markdown(f"""
-    <div style="text-align: center; margin: 2rem 0;">
-        <div class="icon-large">{icon}</div>
-        <h1>{title}</h1>
-        {f'<p style="font-size: 1.2rem; color: #7f8c8d; margin-top: 1rem;">{subtitle}</p>' if subtitle else ''}
-    </div>
-    """, unsafe_allow_html=True)
-
-def create_beautiful_card(content: str, title: str = "", icon: str = ""):
-    """Create a beautiful card with content"""
-    icon_html = f'<div style="font-size: 2rem; margin-bottom: 1rem;">{icon}</div>' if icon else ""
-    title_html = f'<h3 style="margin-bottom: 1rem;">{title}</h3>' if title else ""
-    
-    st.markdown(f"""
-    <div class="custom-card">
-        {icon_html}
-        {title_html}
-        {content}
-    </div>
-    """, unsafe_allow_html=True)
-
-def create_beautiful_divider():
-    """Create a beautiful gradient divider"""
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
 def apply_custom_page_config():
-    """Apply custom page configuration with beautiful theme"""
+    """Apply custom page configuration with light theme"""
     st.set_page_config(
         page_title="Jeff's API Ripper",
         page_icon="🔍",
@@ -306,14 +14,272 @@ def apply_custom_page_config():
         initial_sidebar_state="expanded"
     )
     
-    # Apply the beautiful theme
+    # Apply light theme with custom CSS
     apply_beautiful_theme()
-    
-    # Hide default Streamlit elements
+
+def apply_beautiful_theme():
+    """Apply beautiful light theme with subtle gradients"""
     st.markdown("""
         <style>
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
+        /* Force light theme - override everything */
+        .stApp {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+        }
+        
+        .main {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+        }
+        
+        .main .block-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        
+        /* Override any dark backgrounds */
+        div[data-testid="stAppViewContainer"] {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+        }
+        
+        div[data-testid="stAppViewContainer"] > div {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+        }
+        
+        /* Sidebar background - light gray */
+        .css-1d391kg {
+            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%) !important;
+        }
+        
+        /* Header styling */
+        .main-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            color: white;
+            text-align: center;
+        }
+        
+        .main-header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .main-header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            margin: 0;
+            opacity: 0.95;
+        }
+        
+        /* Beautiful cards */
+        .beautiful-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .beautiful-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .beautiful-card h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .beautiful-card p {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        
+        /* Beautiful dividers */
+        .beautiful-divider {
+            height: 2px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            margin: 2rem 0;
+            border-radius: 1px;
+        }
+        
+        /* Button styling */
+        .stButton > button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stButton > button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Primary button */
+        .stButton > button[data-baseweb="button"] {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+        
+        .stButton > button[data-baseweb="button"]:hover {
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+        
+        /* Input fields */
+        .stTextInput > div > div > input {
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            background: white !important;
+        }
+        
+        .stTextInput > div > div > input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Select boxes */
+        .stSelectbox > div > div {
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            background: white !important;
+        }
+        
+        /* File uploader */
+        .stFileUploader > div {
+            border-radius: 10px;
+            border: 2px dashed #cbd5e0;
+            background: #f7fafc !important;
+        }
+        
+        /* Metrics */
+        .metric-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        
+        /* Expanders */
+        .streamlit-expanderHeader {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        /* Success/Error messages */
+        .stAlert {
+            border-radius: 10px;
+            border: none;
+        }
+        
+        /* Tabs */
+        .stTabs > div > div > div > div {
+            background: white;
+            border-radius: 10px 10px 0 0;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .stTabs > div > div > div > div[aria-selected="true"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        /* Sidebar improvements */
+        .css-1d391kg .css-1lcbmhc {
+            background: white;
+            border-radius: 10px;
+            margin: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        /* Force all text to be readable on light background */
+        .main h1, .main h2, .main h3, .main p, .main div, .main span {
+            color: #2d3748 !important;
+        }
+        
+        /* Streamlit default elements */
+        .stMarkdown, .stText, .stJson, .stCodeBlock {
+            background: transparent !important;
+            color: #2d3748 !important;
+        }
+        
+        /* Remove any remaining dark elements */
+        * {
+            background-color: transparent !important;
+        }
+        
+        .main .block-container, .main .block-container * {
+            background: transparent !important;
+        }
+        
+        /* Ensure proper contrast */
+        .stMarkdown p, .stMarkdown div, .stMarkdown span {
+            color: #2d3748 !important;
+        }
+        
+        /* Force light theme on all elements */
+        div[class*="st"], div[class*="css"] {
+            background: transparent !important;
+        }
+        
+        /* Override any Streamlit dark theme */
+        [data-testid="stAppViewContainer"] {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+        }
+        
+        [data-testid="stAppViewContainer"] * {
+            background: transparent !important;
+        }
+        
         </style>
+        """, unsafe_allow_html=True)
+
+def create_beautiful_header(title: str, subtitle: str, icon: str):
+    """Create a beautiful header with gradient background"""
+    st.markdown(f"""
+        <div class="main-header">
+            <h1>{icon} {title}</h1>
+            <p>{subtitle}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+def create_beautiful_card(content: str, title: str, icon: str):
+    """Create a beautiful card with light background"""
+    st.markdown(f"""
+        <div class="beautiful-card">
+            <h3>{icon} {title}</h3>
+            {content}
+        </div>
+        """, unsafe_allow_html=True)
+
+def create_beautiful_divider():
+    """Create a beautiful gradient divider"""
+    st.markdown('<div class="beautiful-divider"></div>', unsafe_allow_html=True)
+
+def create_metric_card(label: str, value: str, icon: str = ""):
+    """Create a beautiful metric card"""
+    st.markdown(f"""
+        <div class="metric-container">
+            <h4>{icon} {label}</h4>
+            <p style="font-size: 1.5rem; font-weight: 700; color: #667eea; margin: 0;">{value}</p>
+        </div>
         """, unsafe_allow_html=True)

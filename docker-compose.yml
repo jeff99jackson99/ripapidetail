@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  jeffs-api-ripper:
+    build: .
+    container_name: jeffs-api-ripper
+    ports:
+      - "8501:8501"
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Add a database service for storing extraction results
+  # postgres:
+  #   image: postgres:15
+  #   container_name: jeffs-api-ripper-db
+  #   environment:
+  #     POSTGRES_DB: api_ripper
+  #     POSTGRES_USER: api_ripper
+  #     POSTGRES_PASSWORD: password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+
+volumes:
+  postgres_data:

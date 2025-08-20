@@ -8,20 +8,60 @@ import json
 import logging
 from pathlib import Path
 import sys
+import os
 
-# Add src to path for imports
-sys.path.append(str(Path(__file__).parent.parent.parent))
+# Add the current directory to Python path for imports
+current_dir = Path(__file__).parent
+sys.path.insert(0, str(current_dir))
 
-from app.core.extractor import MenuExtractor
-from app.core.advanced_extractor import AdvancedExtractor
-from app.core.gated_api_configs import GatedAPIConfigManager
-from app.core.github_integration import GitHubIntegration
-from app.core.api_analyzer import APIAnalyzer
-from app.core.auto_github import AutoGitHubManager
-from app.core.url_handler import EnhancedURLHandler
-from app.utils.config import load_config
-from app.utils.logging import setup_logging
-from app.utils.theme import apply_custom_page_config, create_beautiful_header, create_beautiful_card, create_beautiful_divider
+# Try multiple import paths for different deployment environments
+try:
+    # Try direct imports from current directory structure (for Streamlit Cloud)
+    from core.extractor import MenuExtractor
+    from core.advanced_extractor import AdvancedExtractor
+    from core.gated_api_configs import GatedAPIConfigManager
+    from core.github_integration import GitHubIntegration
+    from core.api_analyzer import APIAnalyzer
+    from core.auto_github import AutoGitHubManager
+    from core.url_handler import EnhancedURLHandler
+    from utils.config import load_config
+    from utils.logging import setup_logging
+    from utils.theme import apply_custom_page_config, create_beautiful_header, create_beautiful_card, create_beautiful_divider
+    MODULES_LOADED = True
+except ImportError as e:
+    try:
+        # Try the original app.* imports (for local development)
+        from app.core.extractor import MenuExtractor
+        from app.core.advanced_extractor import AdvancedExtractor
+        from app.core.gated_api_configs import GatedAPIConfigManager
+        from app.core.github_integration import GitHubIntegration
+        from app.core.api_analyzer import APIAnalyzer
+        from app.core.auto_github import AutoGitHubManager
+        from app.core.url_handler import EnhancedURLHandler
+        from app.utils.config import load_config
+        from app.utils.logging import setup_logging
+        from app.utils.theme import apply_custom_page_config, create_beautiful_header, create_beautiful_card, create_beautiful_divider
+        MODULES_LOADED = True
+    except ImportError as e2:
+        try:
+            # Try src.app.* imports (alternative path structure)
+            from src.app.core.extractor import MenuExtractor
+            from src.app.core.advanced_extractor import AdvancedExtractor
+            from src.app.core.gated_api_configs import GatedAPIConfigManager
+            from src.app.core.github_integration import GitHubIntegration
+            from src.app.core.api_analyzer import APIAnalyzer
+            from src.app.core.auto_github import AutoGitHubManager
+            from src.app.core.url_handler import EnhancedURLHandler
+            from src.app.utils.config import load_config
+            from src.app.utils.logging import setup_logging
+            from src.app.utils.theme import apply_custom_page_config, create_beautiful_header, create_beautiful_card, create_beautiful_divider
+            MODULES_LOADED = True
+        except ImportError as e3:
+            st.error(f"All import attempts failed. Please check the deployment structure.")
+            st.error(f"Error 1: {str(e)}")
+            st.error(f"Error 2: {str(e2)}")
+            st.error(f"Error 3: {str(e3)}")
+            MODULES_LOADED = False
 
 # Setup logging
 setup_logging()
@@ -29,6 +69,21 @@ logger = logging.getLogger(__name__)
 
 def main():
     """Main Streamlit application"""
+    
+    # Check if modules are available first
+    if not MODULES_LOADED:
+        st.set_page_config(
+            page_title="Jeff's API Ripper",
+            page_icon="🔍",
+            layout="wide",
+            initial_sidebar_state="expanded"
+        )
+        st.error("⚠️ Some modules failed to load. Basic functionality only.")
+        st.info("Please check the deployment logs for more details.")
+        
+        # Show basic functionality
+        show_basic_extraction()
+        return
     
     # Apply beautiful theme and page config
     apply_custom_page_config()
@@ -141,75 +196,80 @@ def main():
         if url_input:
             # Analyze the URL
             with st.spinner("🔍 Analyzing URL..."):
-                url_analysis = url_handler.analyze_url(url_input)
-            
-            # Display URL analysis results
-            if url_analysis.get("accessible"):
-                st.success("✅ URL is accessible!")
-                
-                # Show analysis summary
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Status", f"HTTP {url_analysis.get('status_code', 'N/A')}")
-                with col2:
-                    st.metric("Auth Required", "Yes" if url_analysis.get("auth_required") else "No")
-                with col3:
-                    st.metric("Redirected", "Yes" if url_analysis.get("redirected") else "No")
-                
-                # Show recommendations
-                if url_analysis.get("recommendations"):
-                    st.subheader("📋 Recommendations")
-                    for rec in url_analysis["recommendations"]:
-                        st.info(f"💡 {rec}")
-                
-                # Show detected API endpoints
-                if url_analysis.get("api_endpoints"):
-                    st.subheader("🔗 Detected API Endpoints")
-                    for endpoint in url_analysis["api_endpoints"][:5]:  # Show first 5
-                        st.write(f"• **{endpoint['type']}**: {endpoint['url']}")
-                
-                # Action buttons based on analysis
-                st.subheader("🚀 Choose Extraction Method")
-                
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    if st.button("🌐 Extract from Public URL", type="primary", use_container_width=True):
-                        extract_from_public_url(url_input, extractor, analyzer)
-                
-                with col2:
-                    if st.button("🔐 Extract from Gated API", type="primary", use_container_width=True):
-                        if url_analysis.get("auth_required"):
-                            # Create auth config suggestion
-                            auth_suggestion = url_handler.create_auth_config_suggestion(url_analysis)
-                            extract_gated_api_details(advanced_extractor, config_manager, url_input, auth_suggestion)
-                        else:
-                            st.warning("This URL doesn't appear to require authentication. Use the public URL extraction method instead.")
-                
-                # Show authentication form analysis if available
-                if url_analysis.get("auth_methods"):
-                    st.subheader("🔍 Authentication Form Analysis")
-                    for i, form in enumerate(url_analysis["auth_methods"][:3]):  # Show first 3
-                        with st.expander(f"Form {i+1} (Auth Likelihood: {form['auth_likelihood']:.1%})"):
-                            st.write(f"**Action:** {form['action']}")
-                            st.write(f"**Method:** {form['method']}")
-                            st.write(f"**Fields:** {len(form['fields'])}")
-                            
-                            # Show field details
-                            for field in form['fields']:
-                                field_type = field['type']
-                                field_name = field['name']
-                                if field_type == 'password':
-                                    st.write(f"🔒 **Password Field:** {field_name}")
-                                elif field_type in ['text', 'email']:
-                                    st.write(f"👤 **Username Field:** {field_name}")
-                                elif field_type == 'submit':
-                                    st.write(f"📤 **Submit Button:** {field_name}")
-                
-            else:
-                st.error("❌ URL is not accessible")
-                st.error(f"Error: {url_analysis.get('error', 'Unknown error')}")
-                st.info("💡 Please check the URL and try again")
+                try:
+                    url_analysis = url_handler.analyze_url(url_input)
+                    
+                    # Display URL analysis results
+                    if url_analysis.get("accessible"):
+                        st.success("✅ URL is accessible!")
+                        
+                        # Show analysis summary
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("Status", f"HTTP {url_analysis.get('status_code', 'N/A')}")
+                        with col2:
+                            st.metric("Auth Required", "Yes" if url_analysis.get("auth_required") else "No")
+                        with col3:
+                            st.metric("Redirected", "Yes" if url_analysis.get("redirected") else "No")
+                        
+                        # Show recommendations
+                        if url_analysis.get("recommendations"):
+                            st.subheader("📋 Recommendations")
+                            for rec in url_analysis["recommendations"]:
+                                st.info(f"💡 {rec}")
+                        
+                        # Show detected API endpoints
+                        if url_analysis.get("api_endpoints"):
+                            st.subheader("🔗 Detected API Endpoints")
+                            for endpoint in url_analysis["api_endpoints"][:5]:  # Show first 5
+                                st.write(f"• **{endpoint['type']}**: {endpoint['url']}")
+                        
+                        # Action buttons based on analysis
+                        st.subheader("🚀 Choose Extraction Method")
+                        
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            if st.button("🌐 Extract from Public URL", type="primary", use_container_width=True):
+                                extract_from_public_url(url_input, extractor, analyzer)
+                        
+                        with col2:
+                            if st.button("🔐 Extract from Gated API", type="primary", use_container_width=True):
+                                if url_analysis.get("auth_required"):
+                                    # Create auth config suggestion
+                                    auth_suggestion = url_handler.create_auth_config_suggestion(url_analysis)
+                                    extract_gated_api_details(advanced_extractor, config_manager, url_input, auth_suggestion)
+                                else:
+                                    st.warning("This URL doesn't appear to require authentication. Use the public URL extraction method instead.")
+                        
+                        # Show authentication form analysis if available
+                        if url_analysis.get("auth_methods"):
+                            st.subheader("🔍 Authentication Form Analysis")
+                            for i, form in enumerate(url_analysis["auth_methods"][:3]):  # Show first 3
+                                with st.expander(f"Form {i+1} (Auth Likelihood: {form['auth_likelihood']:.1%})"):
+                                    st.write(f"**Action:** {form['action']}")
+                                    st.write(f"**Method:** {form['method']}")
+                                    st.write(f"**Fields:** {len(form['fields'])}")
+                                    
+                                    # Show field details
+                                    for field in form['fields']:
+                                        field_type = field['type']
+                                        field_name = field['name']
+                                        if field_type == 'password':
+                                            st.write(f"🔒 **Password Field:** {field_name}")
+                                        elif field_type in ['text', 'email']:
+                                            st.write(f"👤 **Username Field:** {field_name}")
+                                        elif field_type == 'submit':
+                                            st.write(f"📤 **Submit Button:** {field_name}")
+                    
+                    else:
+                        st.error("❌ URL is not accessible")
+                        st.error(f"Error: {url_analysis.get('error', 'Unknown error')}")
+                        st.info("💡 Please check the URL and try again")
+                        
+                except Exception as e:
+                    st.error(f"URL analysis failed: {str(e)}")
+                    st.info("Proceeding with basic extraction...")
         
         # File Upload Option
         create_beautiful_divider()
@@ -736,6 +796,33 @@ def generate_api_documentation(results: dict) -> str:
                 docs += "\n"
     
     return docs
+
+def show_basic_extraction():
+    """Show basic extraction functionality when advanced modules fail"""
+    st.header("🔍 Basic API Details Extraction")
+    
+    # URL Input
+    url_input = st.text_input(
+        "Enter URL:",
+        placeholder="https://example.com/dealer-menu",
+        help="Enter the full URL of the site you want to analyze"
+    )
+    
+    if url_input:
+        st.info(f"URL entered: {url_input}")
+        st.warning("Advanced extraction features are not available. Please check the deployment logs.")
+    
+    # File Upload
+    st.subheader("📁 File Upload")
+    uploaded_file = st.file_uploader(
+        "Upload HTML file or text content:",
+        type=['html', 'htm', 'txt'],
+        help="Upload a local file instead of providing a URL"
+    )
+    
+    if uploaded_file:
+        st.info(f"File uploaded: {uploaded_file.name}")
+        st.warning("File processing features are not available. Please check the deployment logs.")
 
 if __name__ == "__main__":
     main()

@@ -78,22 +78,10 @@ def main():
                 auto_github.auto_detect_token()
                 st.rerun()
         else:
-            st.warning("⚠️ No GitHub token detected")
-            st.info("Token will be auto-detected from:")
-            st.write("• Environment variables")
-            st.write("• Git configuration")
-            st.write("• GitHub CLI")
-            st.write("• System keychain")
-            
-            # Manual token input
-            manual_token = st.text_input("Enter GitHub Token (optional)", type="password")
-            if manual_token:
-                try:
-                    auto_github.set_token(manual_token, "Manual")
-                    st.success("Token set successfully!")
-                    st.rerun()
-                except ValueError as e:
-                    st.error(f"Invalid token: {str(e)}")
+            st.info("🔍 Auto-detecting GitHub token...")
+            if st.button("🔄 Retry Detection"):
+                auto_github.auto_detect_token()
+                st.rerun()
         
         # Extraction Settings
         st.subheader("⚙️ Extraction Settings")
